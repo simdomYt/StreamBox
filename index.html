@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StreamBox — Тінь порожнечі (офіційний тизер)</title>
+<style>
+:root{box-sizing:border-box}*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#0f0f12;color:#eee;font-family:Arial,Helvetica,sans-serif;user-select:none}
+#site{max-width:960px;margin:0 auto;padding:10px}
+#site header{display:flex;align-items:center;gap:10px;padding:8px 0;font-weight:bold;font-size:20px}
+#site header span{background:#e50914;border-radius:6px;padding:2px 8px}
+#pl{position:relative;width:min(100%,calc(62vh*16/9));width:min(100%,calc(62dvh*16/9));margin:0 auto;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden;cursor:pointer}
+#pv{width:100%;height:100%;display:block}
+#play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;background:rgba(229,9,20,.92);border:0;color:#fff;font-size:34px;padding:0 0 0 7px;cursor:pointer;box-shadow:0 0 0 0 rgba(229,9,20,.7);animation:pu 1.8s infinite}
+@keyframes pu{70%{box-shadow:0 0 0 22px transparent}}
+#tl{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));display:flex;gap:10px;align-items:center;font-size:12px}
+#tl div{flex:1;height:4px;background:#555}#tl i{display:block;height:100%;width:8%;background:#e50914}
+#btn{margin:12px 0;width:100%;padding:14px;font-size:18px;font-weight:bold;background:#e50914;color:#fff;border:0;border-radius:8px;cursor:pointer}
+h1{font-size:clamp(17px,3.4vw,24px);margin:6px 0}.mt{color:#999;font-size:13px}
+.cm{display:flex;gap:10px;margin:14px 0;font-size:14px}.cm b{display:block;font-size:13px}.av{flex:none;width:34px;height:34px;border-radius:50%;background:#345}
+#stage{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));overflow:hidden;font-family:"Courier New",monospace;color:#fff;background:#000;z-index:50;height:100vh;height:100dvh}
+#stage.fa{filter:invert(1)}#stage.fb{filter:hue-rotate(150deg) saturate(3)}#stage.fc{background:#000!important}#stage.fd{background:#a00!important}
+#scan{position:fixed;inset:0;z-index:70;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 2px,transparent 2px 4px);display:none}
+#log{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:6px;font-size:clamp(9px,1.6vw,13px);color:#9cf;opacity:.45;text-align:left;white-space:pre;overflow:hidden}
+.z{position:relative;z-index:10}
+.big{font-size:clamp(24px,6.5vw,64px);font-weight:bold;text-shadow:3px 0 #f00,-3px 0 #0ff}
+.mid{font-size:clamp(14px,3vw,24px)}
+.gl{animation:gl .7s steps(1) infinite}
+@keyframes gl{0%{transform:none}20%{transform:skewX(18deg) translateX(8px)}25%{transform:none}60%{transform:skewX(-14deg) translateX(-10px);clip-path:inset(0 0 45% 0)}65%{transform:none;clip-path:none}}
+@keyframes bl{50%{opacity:.1}}
+.bar{width:min(86vw,600px);height:24px;border:2px solid #fff;margin:8px 0;background:rgba(0,0,0,.4)}.bar i{display:block;height:100%;width:0;background:#fff}
+.spin{width:54px;height:54px;border:5px solid #333;border-top-color:#e50914;border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 14px}@keyframes sp{to{transform:rotate(360deg)}}
+#pause{position:fixed;inset:0;z-index:200;background:#000;color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:18px;font-size:clamp(15px,3.5vw,24px)}
+button.g{font:inherit;padding:12px 24px;background:#111;color:#0f0;border:2px solid #0f0;cursor:pointer}
+input{font:inherit;font-size:clamp(18px,4vw,24px);padding:9px;width:min(50vw,190px);text-align:center;background:#000;color:#0f0;border:2px solid #0f0}
+pre{margin:0;font-size:clamp(8px,2.8vw,17px);line-height:1.1;color:#ff3b3b;text-shadow:0 0 8px #f00,2px 0 rgba(0,255,255,.5)}
+#ui{background:rgba(0,0,30,.8);padding:8px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid #0f0;color:#0f0}
+.win{position:absolute;width:min(66vw,260px);background:#c0c0c0;color:#000;border:2px outset #fff;font:13px Arial,sans-serif;text-align:left;z-index:20;box-shadow:4px 4px 0 rgba(0,0,0,.5)}
+.win b{display:block;background:#000080;color:#fff;padding:3px 6px}.win b.r{background:#a00}.win p{margin:7px}
+.win .t{background:#000;color:#0f0;font:11px "Courier New",monospace;margin:0;padding:5px;height:64px;overflow:hidden}
+.win .pb{height:14px;border:1px inset #888;margin:0 7px 8px;background:#fff}.win .pb i{display:block;height:100%;background:#0a0;animation:f 1.6s linear infinite}@keyframes f{from{width:0}to{width:100%}}
+#cam{position:absolute;right:8px;bottom:8px;z-index:30;width:104px;border:2px solid #f00;background:#000;color:#f00;font-size:11px;text-align:left}#cam canvas{width:100%;display:block}
+#cur{position:absolute;z-index:40;font-size:26px;color:#fff;text-shadow:0 0 3px #000;left:50%;top:50%;pointer-events:none}
+#bs{position:absolute;inset:0;background:#0078d7;color:#fff;font-family:"Segoe UI",Arial,sans-serif;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:6vw 8vw;gap:2.2vh}
+#bs .f{font-size:clamp(70px,16vw,170px);line-height:1}#bs .m{font-size:clamp(15px,2.8vw,28px);max-width:900px}#bs .s{font-size:clamp(11px,1.6vw,15px);display:flex;gap:16px;align-items:center}
+</style>
+</head>
+<body>
+<div id="site">
+ <header><span>▶</span> StreamBox</header>
+ <div id="pl"><canvas id="pv" width="960" height="540"></canvas><button id="play" aria-label="play">▶</button>
+  <div id="tl"><span>0:12</span><div><i></i></div><span>2:31</span></div></div>
+ <h1>ТІНЬ ПОРОЖНЕЧІ — офіційний тизер (2026)</h1>
+ <div class="mt">4,2 млн переглядів · 3 дні тому · 👍 218 тис.</div>
+ <button id="btn">▶ ДИВИТИСЬ</button>
+ <div class="cm"><div class="av"></div><div><b>Макс_Кінолюб</b>Нарешті щось круте, чекаю з 2023!</div></div>
+ <div class="cm"><div class="av" style="background:#543"></div><div><b>Оля Т.</b>Саундтрек просто космос 🔥</div></div>
+</div>
+<div id="stage"></div><div id="scan"></div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},R=function(n){return Math.floor(Math.random()*n)};
+var stage=$('stage'),scan=$('scan'),root=document.documentElement;
+var phase='site',t=0,popT=0,lastP=-1,lastSeg=-1,fsOK=true,PW='1243',bsP=0,curT=0,cx=0,cy=0,tx=0,ty=0,IP='185.'+R(255)+'.'+R(255)+'.'+R(255),mb=0;
+var UA=navigator.userAgent,OS=/android/i.test(UA)?'android':(/iPhone|iPad|iPod/i.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1))?'ios':'win';
+function isFS(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
+function reqFS(){var f=root.requestFullscreen||root.webkitRequestFullscreen;if(f){try{var p=f.call(root);if(p&&p.catch)p.catch(function(){})}catch(e){}}else fsOK=false}
+
+/* ===== «Фрагмент фільму» (оригінальна анімація на canvas) ===== */
+var pv=$('pv'),pc=pv.getContext('2d'),stars=[];for(var i=0;i<260;i++)stars.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()});
+var pt0=performance.now(),sitePrev=true;
+function preview(ts){
+ if(!sitePrev)return;var s=(ts-pt0)/1000,L=s%12,W=960,H=540,x=pc;
+ x.fillStyle='#02030a';x.fillRect(0,0,W,H);
+ var g=x.createRadialGradient(W*.68,H*.45,10,W*.68,H*.45,260);g.addColorStop(0,'rgba(255,170,90,'+(.25+.15*Math.sin(s))+')');g.addColorStop(.4,'rgba(120,40,160,.25)');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,W,H);
+ var sp=L<8?.004:.004+(L-8)*.03;
+ x.strokeStyle='#cfe';for(var i=0;i<stars.length;i++){var a=stars[i];a.z-=sp;if(a.z<=.02){a.x=Math.random()*2-1;a.y=Math.random()*2-1;a.z=1}
+  var px=W/2+a.x/a.z*W*.35,py=H/2+a.y/a.z*H*.35,qx=W/2+a.x/(a.z+sp*6)*W*.35,qy=H/2+a.y/(a.z+sp*6)*H*.35;x.globalAlpha=Math.min(1,1.1-a.z);x.lineWidth=1+(1-a.z)*1.5;x.beginPath();x.moveTo(qx,qy);x.lineTo(px,py);x.stroke()}
+ x.globalAlpha=1;x.fillStyle='#000';x.beginPath();x.arc(W*.68,H*.45,70,0,7);x.fill();x.strokeStyle='rgba(255,190,120,.8)';x.lineWidth=3;x.beginPath();x.arc(W*.68,H*.45,72,0,7);x.stroke();
+ var al=L<1?L:L>10?Math.max(0,12-L)/2:1;x.globalAlpha=Math.max(0,Math.min(1,al));x.fillStyle='#fff';x.textAlign='center';
+ if(L>1.5&&L<5){x.font='italic 26px Georgia';x.fillText('Є місця, куди не варто дивитись...',W/2,H*.82)}
+ if(L>=5.5){x.font='bold 54px Georgia';x.fillText('ТІНЬ ПОРОЖНЕЧІ',W*.5,H*.6);x.font='18px Arial';x.fillText('ТІЛЬКИ В КІНО · 2026',W/2,H*.68)}
+ x.globalAlpha=.08;for(var j=0;j<120;j++){x.fillStyle=R(2)?'#fff':'#000';x.fillRect(R(W),R(H),2,2)}x.globalAlpha=1;
+ x.fillStyle='#000';x.fillRect(0,0,W,48);x.fillRect(0,H-48,W,48);
+ requestAnimationFrame(preview)}
+requestAnimationFrame(preview);
+
+/* ===== ЗВУК (синтез, неканонічні тембри) ===== */
+var AC,master,nb,drn;
+function audio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.6;master.connect(AC.destination);nb=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);var d=nb.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1}catch(e){AC=null}}
+function blip(f,v){if(!AC)return;var s=AC.currentTime,c=AC.createOscillator(),m=AC.createOscillator(),mg=AC.createGain(),g=AC.createGain();c.type='triangle';c.frequency.value=f;m.type='square';m.frequency.value=f*1.41;mg.gain.value=f*2.4;m.connect(mg);mg.connect(c.frequency);g.gain.setValueAtTime(v||.2,s);g.gain.exponentialRampToValueAtTime(.001,s+.06);c.connect(g);g.connect(master);c.start(s);m.start(s);c.stop(s+.07);m.stop(s+.07)}
+function glitch(len,v){if(!AC)return;var s=AC.currentTime,n=AC.createBufferSource(),b=AC.createBiquadFilter(),g=AC.createGain();n.buffer=nb;n.loop=true;b.type='bandpass';b.Q.value=9;b.frequency.setValueAtTime(300+R(5000),s);b.frequency.exponentialRampToValueAtTime(200+R(6000),s+len);g.gain.setValueAtTime(v||.3,s);g.gain.exponentialRampToValueAtTime(.001,s+len);n.connect(b);b.connect(g);g.connect(master);n.start(s,Math.random()*.5);n.stop(s+len+.02)}
+function riser(){if(!AC)return;var s=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(60,s);o.frequency.exponentialRampToValueAtTime(1400,s+.8);g.gain.setValueAtTime(.001,s);g.gain.exponentialRampToValueAtTime(.2,s+.7);g.gain.exponentialRampToValueAtTime(.001,s+.85);o.connect(g);g.connect(master);o.start(s);o.stop(s+.9)}
+function thump(){if(!AC)return;var s=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,s);o.frequency.exponentialRampToValueAtTime(32,s+.3);g.gain.setValueAtTime(.7,s);g.gain.exponentialRampToValueAtTime(.001,s+.35);o.connect(g);g.connect(master);o.start(s);o.stop(s+.4)}
+function drone(){if(!AC||drn)return;var o=AC.createOscillator(),l=AC.createOscillator(),lg=AC.createGain(),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.value=47;l.frequency.value=1.3;lg.gain.value=18;l.connect(lg);lg.connect(o.frequency);f.type='lowpass';f.frequency.value=240;g.gain.value=.14;o.connect(f);f.connect(g);g.connect(master);o.start();l.start();drn=[o,l]}
+function killAudio(){if(!AC)return;try{master.gain.value=0;if(drn){drn[0].stop();drn[1].stop();drn=0}AC.suspend()}catch(e){}}
+function vib(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+/* ===== ASCII ===== */
+var S=String.raw,GL='█▓▒░#@%&$01<>/\\|';
+var ARTS=[
+[S`      .-"""""""-.
+    .'  _     _  '.
+   /   (O)   (O)   \
+  |        ^        |
+   \     \___/     /
+    '.  |I I I|  .'
+      '-.______.-'`,
+ S`      .-"""""""-.
+    .'  _     _  '.
+   /   (@)   (@)   \
+  |        ^        |
+   \     \_O_/     /
+    '.  |I I I|  .'
+      '-.______.-'
+         \/ \/`],
+[S`      _____       ___---""-.
+     /     \  .-""        /
+    | (o o) |/          ,'
+    |  ---  |/       ,-'
+   /|       |       ,'
+  / |  ___  |\     /
+ /  | |   | | \   /
+    |_|___|_|  \ /
+      |   |     V`,
+ S`      _____    __.--""""--.
+     /     \.-""         /
+    | (O O) |           ,'
+    |  ===  |\       ,-'
+   /|       | \     ,'
+  / |  ___  |  \   /
+ /  | |   | |   \ /
+    |_|___|_|    V
+      |   |`],
+[S`      ______
+     /  __  \
+    |  (••)  |   > root@victim:~#
+     \  \/  /    > sudo rm -rf /
+   ___/|==|\___  > cat passwords.txt
+  /  | [] [] |  \ > upload --all
+ /___|______|___\ > _`,
+ S`      ______
+     /  __  \
+    |  (••)  |   > root@victim:~#
+     \  \/  /    > sudo rm -rf /
+   ___/|==|\___  > cat passwords.txt
+  /  | [] [] |  \ > upload --all
+ /___|______|___\ >`]];
+var TI=['ВИ ЗЛАМАНІ!','ДАНІ ВИКРАДЕНО','L O S E R'];
+function artText(){var sl=10/3,seg=Math.min(2,Math.floor(t/sl)),lt=t-seg*sl,fr=ARTS[seg][Math.floor(t*5)%ARTS[seg].length],g=0;
+ if(seg>0&&lt<.5)g=1-lt/.5;if(seg<2&&lt>sl-.5)g=(lt-sl+.5)/.5;g=Math.max(g,Math.random()<.12?.2:.02);
+ return fr.replace(/[^\s]/g,function(c){return Math.random()<g?GL[R(GL.length)]:c})}
+
+/* ===== системні написи, вікна, дощ, камера ===== */
+var SL=['[ OK ] Mounting /dev/sda1','kernel: ACCESS VIOLATION at 0x','ssh: root login from '+IP+' ','WARNING: firewall disabled','Copying C:\\Users\\Documents\\','Dumping SAM database ','Injecting payload into explorer.exe','Encrypting file ','Uploading cookies.sqlite ','Webcam: stream started','Keylogger: active pid=','Bypassing antivirus...','Sending contacts to server ','Disk C: format 0x'];
+function hex(n){var s='';while(n--)s+=R(16).toString(16);return s.toUpperCase()}
+function addLog(){var l=$('log');if(!l)return;var d=document.createElement('div');d.textContent=SL[R(SL.length)]+hex(2+R(10));l.appendChild(d);while(l.children.length>70)l.removeChild(l.firstChild)}
+var WT=['ПОМИЛКА','ВІРУС ВИЯВЛЕНО','УВАГА!','СИСТЕМА ЗЛАМАНА','ДОСТУП ЗАБОРОНЕНО'],WX=['Ваші файли шифруються...','Видалення даних...','Хакер отримав доступ','Критична помилка 0xDEAD','Ви програли 💀','Камеру увімкнено','Паролі скопійовано'],PX=['Шифрування диска C:','Копіювання фото','Завантаження контактів','Видалення системи','Вивантаження паролів'];
+function popup(){var box=$('hb');if(!box)return;var w=document.createElement('div'),k=R(3),h='';w.className='win';
+ if(k===0)h='<b class="r">'+WT[R(5)]+'</b><p>'+WX[R(7)]+'</p>';else if(k===1)h='<b>'+PX[R(5)]+'</b><p>'+hex(8)+'.dat</p><div class="pb"><i style="animation-duration:'+(.6+Math.random()*1.6)+'s"></i></div>';
+ else{var q='';for(var i=0;i<6;i++)q+=hex(24)+'<br>';h='<b>cmd.exe</b><div class="t">'+q+'root# _</div>'}
+ w.innerHTML=h;box.appendChild(w);w.style.left=R(Math.max(1,innerWidth-w.offsetWidth))+'px';w.style.top=R(Math.max(1,innerHeight-w.offsetHeight))+'px';
+ while(box.querySelectorAll('.win').length>22)box.querySelector('.win').remove();setTimeout(function(){w.remove()},1500+R(1500))}
+function rain(){var c=$('rn');if(!c)return;if(!c.cols){c.width=Math.max(200,innerWidth>>1);c.height=Math.max(200,innerHeight>>1);c.cols=[];for(var i=0;i<c.width/10;i++)c.cols.push(R(c.height/10))}
+ var x=c.getContext('2d');x.fillStyle='rgba(0,16,184,.16)';x.fillRect(0,0,c.width,c.height);x.font='10px monospace';
+ for(var i=0;i<c.cols.length;i++){x.fillStyle=R(8)?'#5f8cff':'#fff';x.fillText(R(2)?'1':'0',i*10,c.cols[i]*10);if(c.cols[i]*10>c.height&&Math.random()>.95)c.cols[i]=0;c.cols[i]++}}
+function cam(){var c=$('cv');if(!c)return;var x=c.getContext('2d');for(var i=0;i<40;i++){var v=R(256);x.fillStyle='rgb('+v+','+v+','+v+')';x.fillRect(R(60),R(45),R(14)+2,R(6)+1)}}
+function mouse(dt){var c=$('cur');if(!c)return;curT-=dt;if(curT<=0){curT=.3+Math.random()*.4;tx=R(innerWidth);ty=R(innerHeight)}cx+=(tx-cx)*.35;cy+=(ty-cy)*.35;c.style.left=cx+'px';c.style.top=cy+'px'}
+
+/* ===== фази ===== */
+var BL='#0010b8';
+function setPhase(p){phase=p;t=0;popT=0;lastP=-1;lastSeg=-1;stage.className='';stage.style.transform='';scan.style.display='none';
+ if(p==='load'){stage.style.display='flex';stage.style.background='#000';stage.innerHTML='<div class="spin"></div><div class="mid">Завантаження відео… <span id="pc">0</span>%</div><div class="bar"><i id="b" style="background:#e50914"></i></div>'}
+ if(p==='blue'){stage.style.background=BL;stage.innerHTML='<div id="log"></div><div class="z mid">Швидке завантаження...</div><div class="z bar"><i id="b"></i></div><div class="z big" id="pc">0%</div>';thump()}
+ if(p==='hack'){stage.style.background=BL;scan.style.display='block';drone();riser();thump();vib([300,80,300,80,500]);
+  stage.innerHTML='<canvas id="rn" style="position:absolute;inset:0;width:100%;height:100%;opacity:.6"></canvas><div id="log"></div><div id="hb" style="position:absolute;inset:0"></div>'+
+  '<div id="info" style="position:absolute;top:6px;left:8px;z-index:30;text-align:left;font-size:clamp(9px,1.8vw,14px);color:#0f0"></div>'+
+  '<div id="cam"><canvas id="cv" width="60" height="45"></canvas>● REC CAM1</div><div id="cur">➤</div>'+
+  '<div class="z" id="cb" style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:none"><div class="z big gl" id="ti" style="color:#ff2b2b">'+TI[0]+'</div><pre class="z" id="art"></pre><div class="z big" style="animation:bl .4s steps(2) infinite">LOSER</div>'+
+  '<div class="z" id="ui"><div class="mid">Щоб завантажити дію, введіть пароль</div><div class="bar" style="border-color:#0f0;margin:3px 0"><i id="b" style="background:#0f0"></i></div><div class="mid" id="pc">1%</div><div><input id="pw" type="tel" inputmode="numeric" autocomplete="off" placeholder="пароль"> <button class="g" id="ok">OK</button></div></div></div>';
+  $('ok').onclick=check;$('pw').onkeydown=function(e){if(e.key==='Enter')check()}}
+ if(p==='bsod'&&OS!=='win'){killAudio();vib(0);mobErr(OS)}
+ if(p==='bsod'&&OS==='win'){killAudio();vib(0);stage.style.background='#0078d7';stage.innerHTML='<div id="bs"><div id="bw" style="display:flex;flex-direction:column;gap:2.2vh;flex:none;transform-origin:left center"><div class="f">:(</div><div class="m">На вашому ПК виникла проблема, і його потрібно перезавантажити. Ми лише збираємо інформацію про помилку, а потім перезавантажимо його.</div><div class="m"><span id="bp">0</span>% завершено</div><div class="s"><canvas id="qr" width="84" height="84" style="background:#fff"></canvas><div>Щоб дізнатися більше, відвідайте https://www.windows.com/stopcode<br>Якщо звернетеся до служби підтримки, повідомте такі дані:<br>Код зупинки: CRITICAL_PROCESS_DIED</div></div></div></div>';fit('bw');
+  var q=$('qr').getContext('2d');q.fillStyle='#000';for(var i=0;i<21;i++)for(var j=0;j<21;j++){var f=(i<7&&(j<7||j>13))||(i>13&&j<7);if(f?(i%6==0||j%6==0||(i%6>1&&i%6<5&&j%6>1&&j%6<5)||i==14||i==20):R(2))q.fillRect(j*4,i*4,4,4)}}
+ if(p==='win'){killAudio();stage.style.background='#000';stage.innerHTML='<div class="big" style="color:#0f0">Пароль вірний!</div><div class="mid" style="color:#0f0">Це був жарт 😄</div>'}}
+function check(){var v=$('pw');if(v&&v.value.trim()===PW)setPhase('win');else if(v){v.value='';v.style.borderColor='#f00';glitch(.2,.3)}}
+
+function start(){audio();if(AC&&AC.resume)AC.resume();sitePrev=false;reqFS();document.body.style.overflow='hidden';$('site').style.display='none';setPhase('load')}
+$('play').onclick=$('btn').onclick=$('pl').onclick=start;
+stage.addEventListener('click',function(){if(fsOK&&!isFS())reqFS()});
+window.addEventListener('resize',function(){var c=$('rn');if(c)c.cols=null});
+function fit(id){var e=$(id);if(!e)return;var s=Math.min(1,(innerHeight-16)/e.offsetHeight,(innerWidth-16)/e.offsetWidth);e.style.transform='scale('+s+')'}
+function mobErr(o){var a=o==='android';stage.style.background=a?'#101820':'linear-gradient(160deg,#4a3b8f,#1b6ca8 60%,#12304f)';
+stage.innerHTML=a?'<div style="width:min(88vw,360px);background:#2b2d31;color:#e6e6e6;border-radius:28px;padding:24px;text-align:left;font-family:Roboto,Arial,sans-serif;box-shadow:0 8px 40px #000"><div style="font-size:30px">⚠️</div><div style="font-size:21px;margin:10px 0 8px">Системний інтерфейс не відповідає</div><div style="font-size:15px;line-height:1.4;color:#c4c7c5">Система Android виявила критичну помилку (0x80070005). Пристрій може працювати нестабільно.</div><div style="display:flex;justify-content:flex-end;gap:18px;margin-top:22px;color:#a8c7fa;font-size:15px;font-weight:bold"><span>ЗАКРИТИ ДОДАТОК</span><span>ЧЕКАТИ</span></div></div>':'<div style="width:min(74vw,290px);background:rgba(240,240,244,.92);color:#000;border-radius:16px;text-align:center;font-family:-apple-system,Helvetica,Arial,sans-serif;overflow:hidden"><div style="padding:18px 16px 14px"><div style="font-weight:600;font-size:17px">Збій системи iOS</div><div style="font-size:13px;margin-top:6px;line-height:1.35">iPhone зіткнувся з критичною помилкою (код 0xE8000015). Потрібне перезавантаження.</div></div><div style="display:flex;border-top:1px solid #c6c6c8;font-size:17px;color:#007aff"><div style="flex:1;padding:12px;border-right:1px solid #c6c6c8">Скасувати</div><div style="flex:1;padding:12px;font-weight:600">Перезапустити</div></div></div>'}
+
+setInterval(function(){
+ if(phase==='site'||phase==='win')return;
+ var dt=.05;t+=dt;
+ if(phase==='load'){var p=Math.min(100,Math.floor(t/3*100));if(p!==lastP){lastP=p;blip(250+p*9,.15);$('pc').textContent=p;$('b').style.width=p+'%'}
+  if(t>2.4&&Math.random()<.5){stage.className=Math.random()<.5?'fa':'fb';glitch(.05,.25)}else stage.className='';if(t>=3){glitch(.4,.4);setPhase('blue')}}
+ else if(phase==='blue'){var q=Math.min(100,(Math.floor(t/.22)+1)*10);if(q!==lastP){lastP=q;blip(300+q*14);$('b').style.width=q+'%';$('pc').textContent=q+'%'}
+  addLog();addLog();if(Math.random()<.2)glitch(.06,.2);if(t>=2.3)setPhase('hack')}
+ else if(phase==='hack'){
+  var p2=Math.max(1,Math.min(100,Math.floor(1+t/10*99)));
+  if(p2!==lastP){lastP=p2;blip(380+p2*13);$('b').style.width=p2+'%';$('pc').textContent=p2+'%';mb+=R(40)+10;var inf=$('info');if(inf)inf.innerHTML='IP: '+IP+'<br>СТАТУС: ЗЛАМАНО<br>КРАДІЖКА: '+mb+' MB<br>КАМЕРА: ON · МІКРОФОН: ON'}
+  var a=$('art');if(a)a.textContent=artText();
+  var seg=Math.min(2,Math.floor(t/(10/3)));if(seg!==lastSeg){lastSeg=seg;$('ti').textContent=TI[seg];if(seg>0){glitch(.5,.4);riser();thump();vib([200,60,200])}}
+  addLog();addLog();rain();cam();mouse(dt);fit('cb');
+  popT+=dt;if(popT>=.2){popT=0;popup();if(Math.random()<.6)glitch(.07,.18)}
+  if(Math.random()<.05)glitch(.15+Math.random()*.2,.3);
+  if(Math.random()<.1+p2/400){var r=Math.random(),m=6+p2*.3;stage.className=r<.4?'fa':r<.7?'fb':r<.88?'fc':'fd';stage.style.transform='translate('+(R(m*2)-m)+'px,'+(R(m*1.4)-m*.7)+'px)';if(r<.4)glitch(.05,.25)}else{stage.className='';stage.style.transform=''}
+  if(t>=10)setPhase('bsod')}
+ else if(phase==='bsod'){fit('bw');if(Math.random()<.35){bsP=Math.min(100,bsP+1+R(3));var e=$('bp');if(e)e.textContent=bsP}}
+},50);
+})();
+</script>
+</body>
+</html>
